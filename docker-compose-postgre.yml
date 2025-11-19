@@ -1,0 +1,21 @@
+version: "3.9"
+
+# 使用以下指令啟動 / 關閉
+# docker compose -f docker-compose-postgre.yml up -d
+# docker compose -f docker-compose-postgre.yml down
+
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: my-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      # 將當前目錄的 postgre-data 資料夾掛載到 PostgreSQL 資料目錄
+      - ./postgre-data:/var/lib/postgresql/data
