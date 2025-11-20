@@ -109,7 +109,3 @@ sudo chmod 700 pgadmin-data
 docker compose -f docker-compose-postgre.yml down
 docker compose -f docker-compose-postgre.yml up -d
 ```
-
----
-
-如需加入自動連接的 `servers.json` 或更多設定，也可以再告訴我，我可以幫你補一份進階版 README。
