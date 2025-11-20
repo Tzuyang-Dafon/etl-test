@@ -1,0 +1,40 @@
+version: "3.9"
+
+# 使用以下指令啟動 / 關閉
+# docker compose -f docker-compose-postgre.yml up -d
+# docker compose -f docker-compose-postgre.yml down
+
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: my-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5001:5432"
+    volumes:
+      - ./postgre-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: my-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      PGADMIN_CONFIG_WTF_CSRF_ENABLED: "False"
+      PGADMIN_CONFIG_WTF_CSRF_CHECK_DEFAULT: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_SERVER_JSON_FILE: "/servers/servers.json"
+    ports:
+      - "5000:80"
+    volumes:
+      - ./pgadmin-data:/var/lib/pgadmin
+      - ./postgre.server.json:/servers/servers.json:ro
+    depends_on:
+      - postgres
