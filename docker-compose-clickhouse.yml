@@ -21,7 +21,7 @@ services:
     container_name: clickhouse-tabix
     restart: unless-stopped
     ports:
-      - "8080:80"     # Web UI 對外 Port
+      - "8100:80"     # Web UI 對外 Port
     environment:
       # 自動預設連線到下面這個 ClickHouse
       - CH_NAME=Local ClickHouse
