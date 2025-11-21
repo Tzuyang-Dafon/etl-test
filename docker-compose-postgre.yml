@@ -59,6 +59,10 @@ services:
       POSTGRES_HOST: postgres
       PG_HOST_PORT: 5432
 
+      # 關閉使用者認證（讓你直接進入 Mage UI，不用登入）
+      DISABLE_USER_AUTHENTICATION: "True"
+
+
       # （選用）如果你想讓 Mage 把「自己的 metadata」也存到 Postgres，而不是用內建 SQLite：
       # MAGE_DATABASE_CONNECTION_URL: "postgresql+psycopg2://myuser:mypassword@postgres:5432/mydb"
       # 需要符合官方文件說明的格式 :contentReference[oaicite:0]{index=0}
