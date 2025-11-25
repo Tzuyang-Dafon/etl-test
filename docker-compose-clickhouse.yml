@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"   # HTTP 介面 (REST / Web UI)
+      - "9000:9000"   # 原生 TCP 介面 (給程式/驅動程式用)
+      - "9009:9009"   # 叢集內部通訊 (單節點也可以保留)
+    volumes:
+      - ./clickhouse-data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  tabix:
+    image: spoonest/clickhouse-tabix-web-client:latest
+    container_name: clickhouse-tabix
+    restart: unless-stopped
+    ports:
+      - "8100:80"     # Web UI 對外 Port
+    environment:
+      # 自動預設連線到下面這個 ClickHouse
+      - CH_NAME=Local ClickHouse
+      - CH_HOST=clickhouse:8123
+      # 如有需要可以加上帳密
+      # - CH_LOGIN=default
+      # - CH_PASSWORD=
+    depends_on:
+      - clickhouse
+
+# volumes:
+  # 這裡也可以改用命名 volume，看你習慣
+  # clickhouse_data:
