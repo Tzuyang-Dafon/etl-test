@@ -1,0 +1,107 @@
+version: "3.9"
+
+# 統一執行所有服務的 docker-compose 檔案
+# 使用以下指令啟動 / 關閉
+# docker compose up -d
+# docker compose down
+
+services:
+  # ===== PostgreSQL =====
+  postgres:
+    image: postgres:16
+    container_name: my-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5001:5432"
+    volumes:
+      - ./postgre-data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: my-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      PGADMIN_CONFIG_WTF_CSRF_ENABLED: "False"
+      PGADMIN_CONFIG_WTF_CSRF_CHECK_DEFAULT: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_SERVER_JSON_FILE: "/servers/servers.json"
+    ports:
+      - "5000:80"
+    volumes:
+      - ./pgadmin-data:/var/lib/pgadmin
+      - ./postgre.server.json:/servers/servers.json:ro
+    depends_on:
+      - postgres
+
+  # ===== ClickHouse =====
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"   # HTTP 介面 (REST / Web UI)
+      - "9000:9000"   # 原生 TCP 介面 (給程式/驅動程式用)
+      - "9009:9009"   # 叢集內部通訊 (單節點也可以保留)
+    volumes:
+      - ./clickhouse-data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  tabix:
+    image: spoonest/clickhouse-tabix-web-client:latest
+    container_name: clickhouse-tabix
+    restart: unless-stopped
+    ports:
+      - "8100:80"     # Web UI 對外 Port
+    environment:
+      # 自動預設連線到下面這個 ClickHouse
+      CH_NAME: Local ClickHouse
+      CH_HOST: clickhouse:8123
+      # 如有需要可以加上帳密
+      # CH_LOGIN: default
+      # CH_PASSWORD:
+    depends_on:
+      - clickhouse
+
+  # ===== Mage AI (ETL UI) =====
+  mage:
+    image: mageai/mageai:latest
+    container_name: my-mage
+    # 第一次會自動建立名為 my_project 的 Mage 專案
+    command: mage start my_project
+    restart: unless-stopped
+    environment:
+      # Mage 本身的執行環境
+      ENV: dev
+      USER_CODE_PATH: /home/src/my_project
+
+      # 提供給 pipeline 用的 DB 連線資訊（在 pipeline 裡可從環境變數拿）
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_HOST: postgres
+      PG_HOST_PORT: 5432
+
+      # 關閉使用者認證（讓你直接進入 Mage UI，不用登入）
+      DISABLE_USER_AUTHENTICATION: "True"
+
+      # （選用）如果你想讓 Mage 把「自己的 metadata」也存到 Postgres，而不是用內建 SQLite：
+      # MAGE_DATABASE_CONNECTION_URL: "postgresql+psycopg2://myuser:mypassword@postgres:5432/mydb"
+      # 需要符合官方文件說明的格式 :contentReference[oaicite:0]{index=0}
+
+    ports:
+      - "6789:6789"
+    volumes:
+      # 把當前資料夾底下的 mage 資料夾掛到容器內
+      - ./mage:/home/src
+    depends_on:
+      - postgres
