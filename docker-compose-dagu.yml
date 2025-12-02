@@ -6,7 +6,7 @@ services:
     container_name: dagu
     restart: unless-stopped
     ports:
-      - "6000:8080"
+      - "7000:8080"
     environment:
       # Web UI 管理員帳密（依你需求修改）
       - DAGU_ADMIN_USER=admin
