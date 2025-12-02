@@ -18,5 +18,5 @@ services:
       # 時區
       - TZ=Asia/Taipei
     volumes:
-      - dagu:/var/lib/dagu
+      - ./dagu:/var/lib/dagu
     command: ["dagu", "start-all"]
