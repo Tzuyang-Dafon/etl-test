@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  dagu:
+    image: ghcr.io/dagu-dev/dagu:latest
+    container_name: dagu
+    restart: unless-stopped
+    ports:
+      - "6000:8080"           # Dagu Web UI
+    environment:
+      # Web UI 管理員帳密（依你需求修改）
+      - DAGU_ADMIN_USER=admin
+      - DAGU_ADMIN_PASSWORD=admin123
+      # DAG 與設定檔路徑（容器內路徑）
+      - DAGU_DB=/data/dagu.db
+      - DAGU_FLOWS_DIR=/data/flows
+      - DAGU_CONFIG=/data/config.yaml
+      # 時區
+      - TZ=Asia/Taipei
+    volumes:
+      # 把 host 的 dagu 目錄掛進容器，方便你編輯 DAG 檔
+      - ./dagu/flows:/data/flows
+      - ./dagu/config.yaml:/data/config.yaml
