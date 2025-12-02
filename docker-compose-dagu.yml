@@ -18,6 +18,4 @@ services:
       # 時區
       - TZ=Asia/Taipei
     volumes:
-      # 把 host 的 dagu 目錄掛進容器，方便你編輯 DAG 檔
-      - ./dagu/flows:/data/flows
-      - ./dagu/config.yaml:/data/config.yaml
+      - dagu:/var/lib/dagu
