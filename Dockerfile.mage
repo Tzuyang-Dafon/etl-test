@@ -9,6 +9,7 @@ COPY instantclient-basic-linux.x64-19.29.0.0.0dbru.zip /tmp/instantclient.zip
 # 安裝 unzip，解壓縮 Oracle Instant Client，並設定路徑
 RUN apt-get update && \
     apt-get install -y unzip && \
+    apt-get install -y libaio1 && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /opt/oracle && \
     unzip -q /tmp/instantclient.zip -d /opt/oracle && \
