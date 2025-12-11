@@ -8,9 +8,10 @@ version: "3.9"
 services:
   mage:
     build:
-      context: .                 # 這裡要能看到 Dockerfile.mage-oracle 和 instantclient_19_23
-      dockerfile: Dockerfile.mage-oracle
-    image: my-mage-oracle:latest 
+      context: .                 # 這裡要能看到 Dockerfile.mage 和 instantclient_19_23
+      dockerfile: Dockerfile.mage
+    image: my-mage-oracle:latest
+    pull_policy: build 
     container_name: my-mage
     # 第一次會自動建立名為 my_project 的 Mage 專案
     command: mage start my_project
